@@ -1,121 +1,259 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Gundam Deck Builder</title>
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#0033A0" />
-  <link rel="icon" type="image/png" sizes="192x192" href="Img/icon-192.png" />
-  <link rel="apple-touch-icon" href="Img/icon-192.png" />
-  <meta name="theme-color" content="#0033A0">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <!-- Bootstrap CSS CDN -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <!-- FontAwesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <!-- Formatting -->
-  <link rel="stylesheet" href="stylesheet.css" />
-</head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>NookPhone - Bell Pro Max</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --nook-green: #43b581;
+            --nook-leaf: #6cc18c;
+            --nook-blue: #5da9e9;
+            --phone-bg: #f9f6e8;
+            --text-main: #6b5c4b;
+            --border-color: #d8d1bc;
+            --resetti-brown: #8b4513;
+        }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body { 
+            font-family: 'Fredoka', sans-serif; 
+            margin: 0; padding: 0; 
+            height: 100vh; width: 100vw;
+            display: flex; justify-content: center; align-items: center;
+            background: linear-gradient(180deg, #a8e063 0%, #56ab2f 100%);
+            overflow: hidden;
+        }
+
+        .nook-phone { 
+            background-color: var(--phone-bg); 
+            border-radius: 40px; 
+            width: 92vw; max-width: 380px; 
+            height: 92vh; max-height: 750px;
+            border: 8px solid #ffffff; 
+            box-shadow: 0 15px 40px rgba(0,0,0,0.25); 
+            position: relative;
+            display: flex; flex-direction: column;
+            z-index: 10;
+        }
+
+        .status-bar { padding: 20px 25px 5px; display: flex; justify-content: space-between; font-size: 13px; color: #8f7e68; font-weight: 600; }
+
+        .app-body { 
+            padding: 10px 20px 20px; 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column;
+        }
+
+        h2#headerText { margin: 5px 0 10px; font-size: 22px; text-align: center; color: var(--nook-green); transition: color 0.3s; }
+
+        .input-group { 
+            background: white; 
+            border: 2px solid var(--border-color); 
+            border-radius: 15px; 
+            padding: 12px; 
+            margin-bottom: 12px; 
+        }
+
+        label { display: block; font-size: 10px; font-weight: bold; color: var(--nook-green); margin-bottom: 4px; text-transform: uppercase; }
+        
+        input, select { 
+            width: 100%; border: none; font-family: 'Fredoka', sans-serif; font-size: 17px; 
+            font-weight: 600; outline: none; background: transparent; color: var(--text-main);
+        }
+
+        .checkbox-container {
+            display: flex; align-items: center; justify-content: center;
+            gap: 12px; font-size: 14px; margin: 10px 0; padding: 12px;
+            color: var(--text-main); font-weight: bold;
+            cursor: pointer; background: rgba(255,255,255,0.5); border-radius: 15px;
+        }
+
+        .checkbox-container input { width: 22px; height: 22px; accent-color: var(--nook-green); }
+
+        .btn { 
+            background: var(--nook-green); color: white; border: none; width: 100%; 
+            padding: 18px; border-radius: 30px; font-weight: 600; font-size: 18px; 
+            box-shadow: 0 5px 0 #329668; transition: all 0.1s; 
+        }
+
+        .btn:active:not(:disabled) { transform: translateY(3px); box-shadow: 0 2px 0 #329668; }
+        .btn:disabled { background: #cbd5e0; box-shadow: 0 5px 0 #a0aec0; opacity: 0.8; }
+
+        /* Shake animation for errors */
+        .shake { animation: shakeBtn 0.4s ease-in-out; }
+        @keyframes shakeBtn {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            50% { transform: translateX(8px); }
+            75% { transform: translateX(-8px); }
+        }
+
+        .nook-chat { 
+            display: flex; align-items: center; gap: 12px; background: #fff; 
+            padding: 15px; border-radius: 20px; border: 2px solid var(--border-color); 
+            margin-top: auto; font-size: 13px; line-height: 1.4; min-height: 85px;
+        }
+
+        #resettiOverlay {
+            display: none; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #ffeb3b; z-index: 1000; flex-direction: column; align-items: center; justify-content: center; padding: 20px; text-align: center; border-radius: 32px;
+        }
+    </style>
+</head>
 <body>
 
-  <header>
-    <h1>Gundam TCG Deck Builder</h1>
-  </header>
-
-  <!-- Bootstrap nav tabs -->
-  <ul class="nav nav-tabs justify-content-center mt-3" id="mainTabs" role="tablist">
-    <li class="nav-item" role="presentation">
-      <button class="nav-link active" id="deck-tab" data-bs-toggle="tab" data-bs-target="#deckView" type="button"
-        role="tab" aria-controls="deckView" aria-selected="true">
-        Decks
-      </button>
-    </li>
-    <li class="nav-item" role="presentation">
-      <button class="nav-link" id="card-tab" data-bs-toggle="tab" data-bs-target="#cardView" type="button" role="tab"
-        aria-controls="cardView" aria-selected="false">
-        Cards
-      </button>
-    </li>
-  </ul>
-
-  <div class="tab-content container-fluid px-3 px-sm-4 mt-4" style="max-width: 800px;">
-    <div class="tab-pane fade show active" id="deckView" role="tabpanel" aria-labelledby="deck-tab">
-      <div class="deck-list">
-        <h2>Your Decks</h2>
-        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-          <input type="text" id="newDeckName" placeholder="New Deck Name" class="form-control flex-grow-1"
-            style="min-width: 220px;" />
-          <button class="btn close-btn" onclick="createDeck()">Add Deck</button>
-        </div>
-        <div id="deckList"></div>
-      </div>
-
-      <div class="deck-list" id="deckContents" style="display:none;">
-        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-          <!-- Left: Deck title -->
-          <h3 id="deckTitle" class="mb-0 flex-grow-1" style="user-select: none; white-space: nowrap;">
-            My Gundam Deck
-          </h3>
-
-          <!-- Right: Rename and Delete controls -->
-          <div class="d-flex align-items-center gap-2 flex-wrap">
-            <input type="text" id="renameInput" placeholder="Rename Deck" class="form-control"
-              style="min-width: 180px; max-width: 220px; display: none;" />
-
-            <button id="renameToggleBtn" onclick="toggleRenameInput()" class="btn btn-link p-0 text-primary"
-              style="font-size: 1.25rem; line-height: 1;" title="Rename Deck" aria-label="Rename Deck">
-              <i class="fa-solid fa-pencil"></i>
-            </button>
-
-            <button class="btn btn-delete-deck" onclick="deleteDeck()" title="Delete Deck" aria-label="Delete Deck">
-              <i class="fa-solid fa-trash"></i>
-            </button>
-          </div>
+    <div class="nook-phone">
+        <div id="resettiOverlay">
+            <div style="font-size: 60px;">⛏️🐹💢</div>
+            <div id="resettiSpeech" style="background:white; padding:15px; border-radius:15px; border:3px solid var(--resetti-brown); font-weight:bold; margin-top:10px;">NOW HOLD ON!</div>
+            <button class="btn" style="margin-top:20px; background: var(--resetti-brown); box-shadow:0 4px 0 #5d2e0a;" onclick="nextLecture()">NEXT >></button>
         </div>
 
-        <div id="deckCards"></div>
-      </div>
+        <div class="status-bar">
+            <span id="time">--:--</span>
+            <span>📶 5G 🔋</span>
+        </div>
+
+        <div class="app-body">
+            <h2 id="headerText">Bell Requisition</h2>
+            
+            <div style="text-align: center; font-size: 10px; background: #fff; border: 1px solid var(--border-color); border-radius: 15px; padding: 5px; margin-bottom: 15px; font-weight: 600;">
+                Official Rate: 124 Bells = 1.00 SGD
+            </div>
+
+            <form id="bellForm">
+                <div class="input-group">
+                    <label>Purpose of Funds</label>
+                    <select id="category">
+                        <option value="Home Renovation">🏠 Home Renovation</option>
+                        <option value="Bridge/Incline">🌉 Infrastructure</option>
+                        <option value="Turnip Investment">📈 Turnip Market</option>
+                        <option value="Island Decor">🌸 Island Decor</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>Amount (Bells 💰)</label>
+                    <input type="number" id="bellAmount" placeholder="0" inputmode="numeric" required>
+                    <div style="font-size: 11px; margin-top: 5px; color: #888;">SGD Equiv: <span id="sgdValue" style="color: var(--nook-green); font-weight: bold;">0.00</span></div>
+                </div>
+
+                <label class="checkbox-container">
+                    <input type="checkbox" id="legalAgree">
+                    <span>I agree to Nook Inc. terms.</span>
+                </label>
+
+                <div id="submitContainer" style="position: relative;">
+                    <div id="badClickTracker" style="position: absolute; width: 100%; height: 60px; z-index: 5;" onclick="trackBadClick()"></div>
+                    <button type="submit" id="submitBtn" class="btn" disabled>SUBMIT TO REP</button>
+                </div>
+            </form>
+
+            <div class="nook-chat">
+                <div style="font-size: 28px;">🦝</div>
+                <div id="nookQuote">Welcome! Please fill out the paperwork, yes, yes!</div>
+            </div>
+        </div>
     </div>
 
-    <div class="tab-pane fade" id="cardView" role="tabpanel" aria-labelledby="card-tab">
-      <div class="card-list mx-auto" style="max-width: 800px;">
-        <h2>Booster Sets</h2>
+    <script>
+        const RATE = 124;
+        let badClicks = 0;
+        let lectureStep = 0;
+        const resettiLines = ["STOP RIGHT THERE!", "The checkbox isn't a suggestion!", "No check, no Bells! Simple!", "Now focus and check the box!"];
 
-        <!-- Add deck selector here -->
-        <div class="d-flex align-items-center gap-2 mb-3 flex-wrap">
-          <label for="deckSelector" class="form-label mb-0">Add to:</label>
-          <select id="deckSelector" class="form-select flex-grow-1"
-            style="min-width: 220px; max-width: 300px;"></select>
-        </div>
+        const bellInput = document.getElementById('bellAmount');
+        const submitBtn = document.getElementById('submitBtn');
+        const nookQuote = document.getElementById('nookQuote');
+        const legalCheck = document.getElementById('legalAgree');
+        const headerText = document.getElementById('headerText');
+        const categorySelect = document.getElementById('category');
 
-        <!-- Booster sets and cards will be dynamically rendered here -->
-        <div id="boosterSetsContainer"></div>
-      </div>
-    </div>
-  </div>
+        function updateUI() {
+            const val = parseInt(bellInput.value) || 0;
+            const category = categorySelect.value;
+            const sgd = (val / RATE).toFixed(2);
+            document.getElementById('sgdValue').innerText = sgd;
 
-  <!-- Card Preview Modal -->
-  <div id="cardPreviewFull" tabindex="-1" role="dialog" aria-modal="true" aria-labelledby="previewName">
-    <button class="close-btn mb-3" onclick="closeFullPreview()">Close ✕</button>
-    <div class="previewSetNo mb-3" id="previewSetNo"></div>
-    <img id="previewImg" src="" alt="Card Image" />
-    <h3 id="previewName"></h3>
-    <div class="translation" id="previewEffect"></div>
-    <div class="set-effect" id="previewSet"></div>
-    <button id="addBtn" class="close-btn mt-3" onclick="addToCurrentDeck(true)">Add to Deck</button>
-  </div>
+            // Restore the specific Quote Logic
+            if (val < 0) {
+                nookQuote.innerText = "Negative Bells? Ho ho! You are trying to take money from ME, yes, yes?!";
+                submitBtn.disabled = true;
+                return;
+            }
 
-  <!-- Bootstrap Bundle JS (includes Popper) -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            if (val >= 1000000) {
+                bellInput.value = 1000000;
+                nookQuote.innerText = "One million Bells is the limit! Even my safe has its boundaries, yes, yes!";
+            } else if (category === "Turnip Investment" && val > 0) {
+                nookQuote.innerText = `Investing ${val.toLocaleString()} Bells? Bold! Daisy Mae doesn't give refunds, yes, yes!`;
+            } else if (val >= 6000) {
+                nookQuote.innerText = `${val.toLocaleString()} Bells? Ho ho! That's almost enough for a small window upgrade!`;
+            } else if (val >= 1240) {
+                nookQuote.innerText = `${val.toLocaleString()} Bells? Exactly the price of a standard shovel, yes, yes!`;
+            } else {
+                nookQuote.innerText = val > 0 ? `I'll process your request for ${val.toLocaleString()} Bells.` : "Welcome! Please fill out the paperwork, yes, yes!";
+            }
 
-  <!-- Your scripts -->
-  <script src="cardsData.js"></script>
-  <script src="functions.js"></script>
+            // Button styling for high amounts
+            if (val > 10000) {
+                headerText.innerText = "Community Donation";
+                headerText.style.color = "var(--nook-blue)";
+                submitBtn.className = "btn btn-blue";
+            } else {
+                headerText.innerText = "Bell Requisition";
+                headerText.style.color = "var(--nook-green)";
+                submitBtn.className = "btn";
+            }
 
+            submitBtn.disabled = !legalCheck.checked || val <= 0;
+            document.getElementById('badClickTracker').style.display = legalCheck.checked ? 'none' : 'block';
+        }
+
+        function trackBadClick() {
+            if (!legalCheck.checked) {
+                badClicks++;
+                
+                // Shake the button
+                submitBtn.classList.remove('shake');
+                void submitBtn.offsetWidth; // Trigger reflow
+                submitBtn.classList.add('shake');
+
+                if ("vibrate" in navigator) navigator.vibrate(80);
+
+                if (badClicks >= 3) {
+                    document.getElementById('resettiOverlay').style.display = 'flex';
+                } else {
+                    nookQuote.innerText = `Watch out! Resetti is watching... (${badClicks}/3)`;
+                }
+            }
+        }
+
+        function nextLecture() {
+            if (lectureStep < resettiLines.length) {
+                document.getElementById('resettiSpeech').innerText = resettiLines[lectureStep++];
+            } else { location.reload(); }
+        }
+
+        bellInput.addEventListener('input', updateUI);
+        legalCheck.addEventListener('change', updateUI);
+        categorySelect.addEventListener('change', updateUI);
+
+        document.getElementById('bellForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert("Sent! Tom Nook has received your request.");
+            location.reload();
+        });
+
+        function updateClock() {
+            document.getElementById('time').innerText = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+        setInterval(updateClock, 1000); updateClock();
+    </script>
 </body>
-
 </html>
